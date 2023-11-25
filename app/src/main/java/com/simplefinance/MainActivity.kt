@@ -30,8 +30,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.simplefinance.common.ui.BaseUiModel
-import com.simplefinance.feature.news.presentation.model.UserUiError
-import com.simplefinance.feature.news.presentation.model.UserUiModel
 import com.simplefinance.feature.news.presentation.ui.NewsScreen
 import com.simplefinance.feature.news.presentation.viewmodel.NewsViewModel
 import com.simplefinance.feature.splash.presentation.SplashScreen
@@ -83,15 +81,7 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         GetNavHost(navController = navController)
-                        when (collectAsState) {
-                            is UserUiModel -> {
-                                Text(text = (collectAsState as UserUiModel).name)
-                            }
 
-                            is UserUiError -> {
-                                Text(text = collectAsState.error)
-                            }
-                        }
                     } /*{
                     //content
                     *//*
@@ -116,7 +106,7 @@ class MainActivity : ComponentActivity() {
         NavHost(navController = navController, startDestination = Screens.Splash.route) {
             composable(Screens.Details.route + "?id={uid}") { Text(text = "Profile") }
             composable(Screens.Profile.route) { Text(text = "friendlist") }
-            composable(Screens.News.route) { NewsScreen(navController = navController) }
+            composable(Screens.News.route) { NewsScreen(navController = navController,viewModel) }
             composable(Screens.Splash.route) { SplashScreen(navController = navController) }
         }
     }

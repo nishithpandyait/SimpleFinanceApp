@@ -16,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.simplefinance.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -25,15 +25,18 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildFeatures {
         compose = true
@@ -44,10 +47,31 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+            merges += "win32-x86/attach_hotspot_windows.dll"
+            merges += "win32-x86-64/attach_hotspot_windows.dll"
+            merges += "META-INF/licenses/ASM"
         }
     }
 }
-
+allprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
+        }
+    }
+}
+hilt {
+    enableTransformForLocalTests = true
+}
+kapt {
+    arguments {
+        // Make Hilt share the same definition of Components in tests instead of
+        // creating a new set of Components per test class.
+        arg("dagger.hilt.shareTestComponents", "true")
+    }
+}
 dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
@@ -59,6 +83,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.test:core-ktx:1.5.0")
+    implementation("androidx.test:runner:1.5.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -66,9 +91,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
     val room_version = "2.6.0"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -80,13 +104,27 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     val nav_version = "2.7.4"
 
+    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
+
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    testImplementation("com.google.dagger:hilt-android-testing:2.44")
-    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
-    androidTestImplementation ("androidx.arch.core:core-testing:2.1.0")
 
 
+    val mockitoVersion = "1.13.8"
+    testImplementation("io.mockk:mockk:$mockitoVersion")
+    testImplementation("org.mockito:mockito-core:3.+")
+    androidTestImplementation("io.mockk:mockk:$mockitoVersion")
+    androidTestImplementation("org.mockito:mockito-core:3.+")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.0.17")
+
+
+    val hiltVersion = "2.44"
+    // Hilt
+    implementation ("com.google.dagger:hilt-android:$hiltVersion")
+    kapt ("com.google.dagger:hilt-android-compiler:$hiltVersion")
+
+    // Hilt testing
+    androidTestImplementation ("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptAndroidTest ("com.google.dagger:hilt-android-compiler:$hiltVersion")
 }
 kapt {
     correctErrorTypes = true
