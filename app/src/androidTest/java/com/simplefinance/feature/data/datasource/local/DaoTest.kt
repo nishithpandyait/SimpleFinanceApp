@@ -1,4 +1,4 @@
-package com.simplefinance
+package com.simplefinance.feature.data.datasource.local
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4

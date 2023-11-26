@@ -4,17 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -30,10 +31,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.simplefinance.common.ui.BaseUiModel
+import com.simplefinance.feature.navigation.data.model.Screens
 import com.simplefinance.feature.news.presentation.ui.NewsScreen
 import com.simplefinance.feature.news.presentation.viewmodel.NewsViewModel
 import com.simplefinance.feature.splash.presentation.SplashScreen
-import com.simplefinance.ui.Screens
 import com.simplefinance.ui.theme.SimpleFinanceAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,7 +46,6 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             SimpleFinanceAppTheme {
                 val collectAsState by viewModel.uiData.collectAsState(BaseUiModel())
@@ -58,47 +58,57 @@ class MainActivity : ComponentActivity() {
                         })
                     },
                     bottomBar = {
-                        BottomAppBar(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.primary,
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                text = "Bottom app bar",
-                            )
-                        }
+                        GetBottomBar(navController)
                     },
                     floatingActionButton = {
                         FloatingActionButton(onClick = { }) {
-                            Icon(Icons.Default.Add, contentDescription = "Add")
+                            Icon(Icons.Default.Add, contentDescription = getString(R.string.add))
                         }
                     }) { innerPadding ->
                     Column(
-                        modifier = Modifier
-                            .padding(innerPadding),
+                        modifier = Modifier.padding(innerPadding),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         GetNavHost(navController = navController)
-
-                    } /*{
-                    //content
-                    *//*
-                     }*//*
-                    Text(style = TextStyle(color = Color.Blue), text = "Hello")
-                    //
-                    it
-
-                }*/
+                    }
                 }
             }
         }
     }
 
     @Composable
-    fun GetBottomBar() {
+    fun GetBottomBar(navController: NavHostController) {
+        val navigationScreens =
+            mutableListOf<Screens>(Screens.News, Screens.Details, Screens.Profile)
 
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.primary,
+        ) {
+            for (it in navigationScreens) {
+                NavigationBarItem(selected = it.selected,
+                    modifier = Modifier,
+                    onClick = {
+                        it.selected = it.selected
+                        navController.popBackStack()
+                        navController.navigate(it.route)
+                    },
+                    icon = {
+                        Image(
+                            imageVector = if (it.selected) it.image else it.imageUnselected,
+                            contentDescription = it.route + if (it.selected) {
+                                stringResource(R.string.selected)
+                            } else {
+                                ""
+                            }
+                        )
+                    },
+                    enabled = true,
+                    label = { Text(text = it.route + it.badgeText) }
+                )
+            }
+
+        }
     }
 
     @Composable
@@ -106,7 +116,7 @@ class MainActivity : ComponentActivity() {
         NavHost(navController = navController, startDestination = Screens.Splash.route) {
             composable(Screens.Details.route + "?id={uid}") { Text(text = "Profile") }
             composable(Screens.Profile.route) { Text(text = "friendlist") }
-            composable(Screens.News.route) { NewsScreen(navController = navController,viewModel) }
+            composable(Screens.News.route) { NewsScreen(navController = navController, viewModel) }
             composable(Screens.Splash.route) { SplashScreen(navController = navController) }
         }
     }
@@ -115,7 +125,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun GreetingPreview() {
         SimpleFinanceAppTheme {
-
 
         }
     }

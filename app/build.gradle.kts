@@ -8,7 +8,13 @@ plugins {
 android {
     namespace = "com.simplefinance"
     compileSdk = 34
-
+    testOptions {
+        packagingOptions {
+            jniLibs {
+                useLegacyPackaging = true
+            }
+        }
+    }
     defaultConfig {
         applicationId = "com.simplefinance"
         minSdk = 26
@@ -102,7 +108,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$room_version")
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
-    val nav_version = "2.7.4"
+    val nav_version = "2.7.5"
 
     androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
@@ -112,19 +118,26 @@ dependencies {
     val mockitoVersion = "1.13.8"
     testImplementation("io.mockk:mockk:$mockitoVersion")
     testImplementation("org.mockito:mockito-core:3.+")
-    androidTestImplementation("io.mockk:mockk:$mockitoVersion")
+    androidTestImplementation("io.mockk:mockk-android:$mockitoVersion")
     androidTestImplementation("org.mockito:mockito-core:3.+")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.0.17")
 
 
     val hiltVersion = "2.44"
     // Hilt
-    implementation ("com.google.dagger:hilt-android:$hiltVersion")
-    kapt ("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     // Hilt testing
-    androidTestImplementation ("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptAndroidTest ("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+
+    val work_version = "2.8.1"
+
+    // Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:$work_version")
+    // optional - Test helpers
+    androidTestImplementation("androidx.work:work-testing:$work_version")
 }
 kapt {
     correctErrorTypes = true

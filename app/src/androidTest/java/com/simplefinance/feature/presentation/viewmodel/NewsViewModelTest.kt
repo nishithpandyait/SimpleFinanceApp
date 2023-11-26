@@ -1,4 +1,4 @@
-package com.simplefinance
+package com.simplefinance.feature.presentation.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
