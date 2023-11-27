@@ -20,11 +20,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -83,35 +88,52 @@ class MainActivity : ComponentActivity() {
     fun GetBottomBar(navController: NavHostController) {
         val navigationScreens =
             mutableListOf<Screens>(Screens.News, Screens.Details, Screens.Profile)
-
-        NavigationBar(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.primary,
-        ) {
-            for (it in navigationScreens) {
-                NavigationBarItem(selected = it.selected,
-                    modifier = Modifier,
-                    onClick = {
-                        it.selected = it.selected
-                        navController.popBackStack()
-                        navController.navigate(it.route)
-                    },
-                    icon = {
-                        Image(
-                            imageVector = if (it.selected) it.image else it.imageUnselected,
-                            contentDescription = it.route + if (it.selected) {
-                                stringResource(R.string.selected)
-                            } else {
-                                ""
-                            }
-                        )
-                    },
-                    enabled = true,
-                    label = { Text(text = it.route + it.badgeText) }
-                )
-            }
-
+        var isBottomBarVisible by remember {
+            mutableStateOf(false)
         }
+        DisposableEffect(navController) {
+            val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+                // Set isBottomBarVisible based on the destination
+                isBottomBarVisible =
+                    destination.route !in setOf(Screens.Splash.route, Screens.Login.route)
+            }
+            navController.addOnDestinationChangedListener(listener)
+            onDispose {
+                navController.removeOnDestinationChangedListener(listener)
+            }
+        }
+        if (isBottomBarVisible) {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ) {
+                for (it in navigationScreens) {
+                    NavigationBarItem(selected = it.selected,
+                        modifier = Modifier,
+                        onClick = {
+                            it.selected = it.selected
+                            navController.popBackStack()
+                            navController.navigate(it.route)
+                        },
+                        icon = {
+                            Image(
+                                imageVector = if (it.selected) it.image else it.imageUnselected,
+                                contentDescription = it.route + if (it.selected) {
+                                    stringResource(R.string.selected)
+                                } else {
+                                    ""
+                                }
+                            )
+                        },
+                        enabled = true,
+                        label = { Text(text = it.route + it.badgeText) }
+                    )
+                }
+
+            }
+        }
+
+
     }
 
     @Composable
@@ -121,7 +143,9 @@ class MainActivity : ComponentActivity() {
             composable(Screens.Profile.route) { Text(text = "friendlist") }
             composable(Screens.News.route) { NewsScreen(navController = navController, viewModel) }
             composable(Screens.Splash.route) { SplashScreen(navController = navController) }
-            composable(Screens.Login.route) { LoginScreen(navController = navController,loginViewModel) }
+            composable(Screens.Login.route) {
+                LoginScreen(navController = navController, loginViewModel)
+            }
         }
     }
 
