@@ -1,4 +1,4 @@
-package com.simplefinance.feature.navigation.data.model
+package com.simplefinance.common.navigation.data.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -17,7 +17,9 @@ sealed class Screens(
     var selected: Boolean = false,
     var badgeText: String = ""
 ) {
-    object Profile :Screens("Profile", image = Icons.Filled.Home, imageUnselected = Icons.Outlined.Home)
+    object Login : Screens("Login", image = Icons.Filled.Home, imageUnselected = Icons.Outlined.Home)
+
+    object Profile : Screens("Profile", image = Icons.Filled.Home, imageUnselected = Icons.Outlined.Home)
 
     object Details : Screens("Details",image = Icons.Filled.AccountCircle,imageUnselected = Icons.Outlined.AccountCircle)
 

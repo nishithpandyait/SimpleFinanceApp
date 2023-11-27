@@ -25,23 +25,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.simplefinance.common.ui.BaseUiModel
-import com.simplefinance.feature.navigation.data.model.Screens
+import com.simplefinance.common.navigation.data.model.Screens
+import com.simplefinance.feature.login.presentation.ui.LoginScreen
+import com.simplefinance.feature.login.presentation.viewmodel.LoginViewModel
 import com.simplefinance.feature.news.presentation.ui.NewsScreen
 import com.simplefinance.feature.news.presentation.viewmodel.NewsViewModel
 import com.simplefinance.feature.splash.presentation.SplashScreen
 import com.simplefinance.ui.theme.SimpleFinanceAppTheme
+import com.simplefinance.ui.theme.spacing_medium
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     val viewModel: NewsViewModel by viewModels()
+    val loginViewModel: LoginViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +70,7 @@ class MainActivity : ComponentActivity() {
                     }) { innerPadding ->
                     Column(
                         modifier = Modifier.padding(innerPadding),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(spacing_medium),
                     ) {
                         GetNavHost(navController = navController)
                     }
@@ -118,6 +121,7 @@ class MainActivity : ComponentActivity() {
             composable(Screens.Profile.route) { Text(text = "friendlist") }
             composable(Screens.News.route) { NewsScreen(navController = navController, viewModel) }
             composable(Screens.Splash.route) { SplashScreen(navController = navController) }
+            composable(Screens.Login.route) { LoginScreen(navController = navController,loginViewModel) }
         }
     }
 

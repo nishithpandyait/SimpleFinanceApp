@@ -3,6 +3,7 @@ package com.simplefinance.common.di
 import android.content.Context
 import androidx.room.Room
 import com.simplefinance.common.database.AppDatabase
+import com.simplefinance.feature.login.data.datasource.local.LoginDao
 import com.simplefinance.feature.news.data.datasource.local.NewsDao
 import dagger.Module
 import dagger.Provides
@@ -27,5 +28,10 @@ class DatabaseModule {
     @Provides
     fun getUserDao(appDatabase: AppDatabase): NewsDao {
         return appDatabase.getNewsDao()
+    }
+
+    @Provides
+    fun getLoginDao(appDatabase: AppDatabase): LoginDao {
+        return appDatabase.getLoginDao()
     }
 }

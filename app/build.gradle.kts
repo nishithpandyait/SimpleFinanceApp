@@ -138,6 +138,9 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:$work_version")
     // optional - Test helpers
     androidTestImplementation("androidx.work:work-testing:$work_version")
+
+    implementation ("com.jakewharton.timber:timber:5.0.1")
+
 }
 kapt {
     correctErrorTypes = true

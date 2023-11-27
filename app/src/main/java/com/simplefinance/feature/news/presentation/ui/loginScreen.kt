@@ -9,28 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
-import com.simplefinance.feature.news.presentation.model.UserUiError
-import com.simplefinance.feature.news.presentation.model.UserUiModel
+import com.simplefinance.feature.news.presentation.model.NewsUiState
+import com.simplefinance.feature.news.presentation.model.NewsErrorUiState
 import com.simplefinance.feature.news.presentation.viewmodel.NewsViewModel
 
 @Composable
 fun NewsScreen(navController: NavController, viewModel: NewsViewModel) {
     val uiData by viewModel.uiData.collectAsState()
 
-    IconButton(onClick = {}) {
-        Icon(
-            imageVector = Icons.Filled.Share,
-            contentDescription = "Hello"
-        )
-    }
-
     when (uiData) {
-        is UserUiModel -> {
-            Text(text = (uiData as UserUiModel).name)
+        is NewsErrorUiState -> {
+            Text(text = (uiData as NewsErrorUiState).name)
         }
 
-        is UserUiError -> {
-            Text(text = (uiData as UserUiError).error)
+        is NewsUiState -> {
+            Text(text = (uiData as NewsUiState).error)
         }
     }
 }

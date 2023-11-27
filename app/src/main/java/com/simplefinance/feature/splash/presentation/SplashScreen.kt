@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
-import com.simplefinance.feature.navigation.data.model.Screens
+import com.simplefinance.common.navigation.data.model.Screens
 import kotlinx.coroutines.delay
 
 @Composable
@@ -16,6 +16,6 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(key1 = true) {
         delay(2000)
         navController.popBackStack()
-        navController.navigate(Screens.News.route)
+        navController.navigate(Screens.Login.route)
     }
 }
