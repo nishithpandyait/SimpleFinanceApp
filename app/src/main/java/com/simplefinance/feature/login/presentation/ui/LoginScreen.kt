@@ -10,6 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,7 +41,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.simplefinance.R
 import com.simplefinance.common.navigation.data.model.Screens
 import com.simplefinance.common.ui.components.CTextField
@@ -47,7 +56,10 @@ import com.simplefinance.ui.theme.spacing_small
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val uiData by viewModel.uiData.collectAsState()
     when (uiData) {
         is LoginUiState.SuccessUiState -> {
@@ -58,9 +70,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
             Text(text = (uiData as LoginUiState.ErrorUiState).error)
         }
     }
-    var email by remember { mutableStateOf(TextFieldValue()) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
-    var isPasswordVisible by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -78,12 +88,12 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
             placeholder = { Text(stringResource(R.string.email)) },
             leadingIcon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    Icons.Outlined.MailOutline,
                     contentDescription = null,
                     modifier = Modifier.size(spacing_medium)
                 )
@@ -96,28 +106,28 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
         Spacer(modifier = Modifier.height(spacing_medium))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
             placeholder = { Text(stringResource(R.string.password)) },
             leadingIcon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    Icons.Default.Key,
                     contentDescription = null,
                     modifier = Modifier.size(spacing_medium)
                 )
             },
             trailingIcon = {
                 IconButton(onClick = {
-                    isPasswordVisible = !isPasswordVisible
+                    viewModel.isPasswordVisible = !viewModel.isPasswordVisible
                 }) {
                     Icon(
-                        painter = painterResource(id = if (isPasswordVisible) R.drawable.ic_launcher_background else R.drawable.ic_launcher_background),
+                        imageVector = if (viewModel.isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                         contentDescription = null,
                         modifier = Modifier.size(spacing_medium)
                     )
                 }
             },
-            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (viewModel.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done

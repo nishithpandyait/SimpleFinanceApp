@@ -1,6 +1,7 @@
 package com.simplefinance
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -48,17 +49,28 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    val viewModel: NewsViewModel by viewModels()
-    val loginViewModel: LoginViewModel by viewModels()
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SimpleFinanceAppTheme {
-                val collectAsState by viewModel.uiData.collectAsState(BaseUiModel())
+
                 val navController = rememberNavController()
                 // A surface container using the 'background' color from the theme
+                var isFabVisible by remember {
+                    mutableStateOf(false)
+                }
+                DisposableEffect(navController) {
+                    val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+                        // Set isBottomBarVisible based on the destination
+                        isFabVisible =
+                            destination.route !in setOf(Screens.Splash.route, Screens.Login.route)
+                    }
+                    navController.addOnDestinationChangedListener(listener)
+                    onDispose {
+                        navController.removeOnDestinationChangedListener(listener)
+                    }
+                }
                 Scaffold(
                     topBar = {
                         TopAppBar(title = {
@@ -69,8 +81,13 @@ class MainActivity : ComponentActivity() {
                         GetBottomBar(navController)
                     },
                     floatingActionButton = {
-                        FloatingActionButton(onClick = { }) {
-                            Icon(Icons.Default.Add, contentDescription = getString(R.string.add))
+                        if (isFabVisible) {
+                            FloatingActionButton(onClick = { }) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = getString(R.string.add)
+                                )
+                            }
                         }
                     }) { innerPadding ->
                     Column(
@@ -87,7 +104,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun GetBottomBar(navController: NavHostController) {
         val navigationScreens =
-            mutableListOf<Screens>(Screens.News, Screens.Details, Screens.Profile)
+            setOf<Screens>(Screens.News, Screens.Details, Screens.Profile)
         var isBottomBarVisible by remember {
             mutableStateOf(false)
         }
@@ -136,15 +153,19 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    fun normalFunction() {
+        Toast.makeText(this@MainActivity, "", Toast.LENGTH_SHORT).show()
+    }
+
     @Composable
     fun GetNavHost(navController: NavHostController) {
         NavHost(navController = navController, startDestination = Screens.Splash.route) {
             composable(Screens.Details.route + "?id={uid}") { Text(text = "Profile") }
             composable(Screens.Profile.route) { Text(text = "friendlist") }
-            composable(Screens.News.route) { NewsScreen(navController = navController, viewModel) }
+            composable(Screens.News.route) { NewsScreen(navController = navController) }
             composable(Screens.Splash.route) { SplashScreen(navController = navController) }
             composable(Screens.Login.route) {
-                LoginScreen(navController = navController, loginViewModel)
+                LoginScreen(navController = navController)
             }
         }
     }
